@@ -1,14 +1,98 @@
 ---
 title: "Gov 50 Final Project"
-author: "Your Name Here"
-description: "My final project"
+author: "Sebastian Lennox"
+description: "Glaciers and Climate Change"
 output:
   distill::distill_article:
     self_contained: false
 ---
 
+How much does Carbon Dioxide released by the consumption of solid fuel contribute to loss of glacial mass? When we think about observable effects of climate disruptions and how they can exacerbate an already negative situation, glacial melting is one of the first things that comes to mind. Not only does the melting of glaciers result in habitat loss for arctic creatures, but it also contributes to rising sea levels and a difficulty in reducing rising global temperatures (due to water's notable ability to retain heat). Thus, studying what the most detrimental contributing factors to glacial melting are is important to determining how to preserve them. 
 
+While general Carbon Dioxide release and global warming are directly responsible for the loss of glacial mass, specific greenhouse gases likely have a more detrimental effect on the loss of glaciers. Specifically, solid fuel has been one of the greatest contributors to total global Carbon Dioxide emissions since 1950 (the start of the data set), sometimes eclipsing the carbon emissions of the rest of the pollutants combined. Therefore, I hypothesize that in years when solid fuel contribution to Carbon Dioxide emissions was greater than the other contributors combined, glacial mass decrease occurred at a greater (absolute) rate than in years when it did not. 
 
-## Project thoughts
+```{r echo = FALSE}
+library(tidyverse)
+library(dplyr)
+library(readr)
 
-I am interested in exploring data related to...
+Global_FF_Data <- read_csv("~/Downloads/co2-fossil-global_zip/data/global_csv.csv")
+
+Glacial_Mass <- read_csv("~/Downloads/glacier-mass-balance_zip/data/glaciers_csv.csv")
+
+Global_FF_Data <- Global_FF_Data |> 
+  left_join(Glacial_Mass, by = "Year") |>
+  drop_na() |> 
+  mutate(No_Solid = `Total` - `Solid Fuel`) |> 
+  mutate(
+    "Solid Fuel Greater" = if_else(`Solid Fuel` > `No_Solid`, "1", "0"))
+knitr::kable(head(Global_FF_Data))
+
+Frequency_Glacier <- 
+  ggplot(Global_FF_Data, aes(x = `Mean cumulative mass balance`)) + 
+  geom_histogram() + 
+  labs(
+    x = "Change in Mass Balance of Glaciers (m of Water)", 
+    y = "Frequency of Changes in Mass Balance of Glaciers", 
+    title = "Frequency of Changes in Mass Balance from 1950 to 2010"
+  )
+Frequency_Glacier
+```
+The data in this project comes from two separate sources. The first data set, involving Carbon Dioxide emissions from specific sources, is taken from the Carbon Dioxide Information Analysis Center. The collected data spans all the way back to 1751, and includes yearly totals for Total, Gas Fuel, Liquid Fuel, Solid Fuel, Cement production, Gas Flaring, and per capita Carbon Dioxide emissions. The data from before 1950 was collected by using estimations based on energy production and trade (imports and exports) data, as opposed to solely production data (which was used for the last ~60 years of data in the set). The second data set, constructed with help from the US EPA and the World Glacier Monitoring Service, includes yearly totals for the amount of change in glacial mass and the number of glaciers observed. The former metric was observed using mass balance graphs. 
+
+The independent variable in this project is time. It is observed in two separate chunks, one from 1950 to 1963, when Solid Fuel was the majority contributor to fossil fuel Carbon Dioxide emissions and the other from 1964 to 2010, when Solid Fuel was not the majority contributor to fossil fuel Carbon Dioxide emissions. The dependent variable for this project is the average glacial mass balance change. This is a before and after experiment, as the trends for glacial mass loss are being measured in two separate time chunks. 
+
+```{r echo = FALSE}
+Solid_Glacier <- 
+  ggplot(Global_FF_Data, aes(x = `Solid Fuel`, y = `Mean cumulative mass balance`)) + 
+  geom_point() + 
+  labs(
+    x = "Carbon Emissions from Solid Fuel (million metric tons of Carbon)", 
+    y = "Change in Mass Balance of Glaciers (m of Water)", 
+    title = "The Effect of Solid Fuel Carbon Emissions on Average Change in Galcial Mass"
+  ) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 1.5)
+Solid_Glacier
+```
+
+```{r echo = FALSE}
+SG_SYes <- Global_FF_Data |>
+  filter(`Solid Fuel Greater` == 1)
+SG_SNo <- Global_FF_Data |>
+  filter(`Solid Fuel Greater` == 0)
+
+SG_SYes_Plot <- 
+  ggplot(SG_SYes, aes(x = `Year`, y = `Mean cumulative mass balance`)) + 
+  geom_point() +
+  labs(
+    x = "Year", 
+    y = "Change in Mass Balance of Glaciers (m of Water)", 
+    title = "Change in Mass Balance of Glaciers over Time with Solid Fuel as a Major Contributor to CO2 Emissions"
+  ) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 1.5)
+SG_SYes_Plot
+
+fit_SG_SYes = lm(`Mean cumulative mass balance` ~ Year, data = SG_SYes)
+modelsummary::modelsummary(fit_SG_SYes,
+                           statistic = c("s.e. = {std.error}",
+                                         "p = {p.value}"),
+                           gof_map = c("nobs", "r.squared", "adj.r.squared"))
+
+SG_SNo_Plot <- 
+  ggplot(SG_SNo, aes(x = `Year`, y = `Mean cumulative mass balance`)) + 
+  geom_point() +
+  labs(
+    x = "Year", 
+    y = "Change in Mass Balance of Glaciers (m of Water)", 
+    title = "Change in Mass Balance of Glaciers over Time with Solid Fuel as a non-Major Contributor to CO2 Emissions"
+  ) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 1.5)
+SG_SNo_Plot
+
+fit_SG_SNo = lm(`Mean cumulative mass balance` ~ Year, data = SG_SNo)
+modelsummary::modelsummary(fit_SG_SNo,
+                           statistic = c("s.e. = {std.error}",
+                                         "p = {p.value}"),
+                           gof_map = c("nobs", "r.squared", "adj.r.squared"))
+```
+
