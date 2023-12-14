@@ -11,7 +11,7 @@ How much does Carbon Dioxide released by the consumption of Solid Fuel contribut
 
 While general Carbon Dioxide release and global warming are directly responsible for the loss of glacial mass, specific greenhouse gases likely have a more detrimental effect on the loss of glaciers. Specifically, Solid Fuel has been one of the greatest contributors to total global Carbon Dioxide emissions since 1950 (the start of the data set), sometimes eclipsing the carbon emissions of the rest of the pollutants combined. Therefore, I hypothesize that in years when Solid Fuel contribution to Carbon Dioxide emissions was greater than the other contributors combined, glacial mass decrease occurred at a greater (absolute) rate than in years when it did not. 
 
-```{r echo = FALSE}
+```{r}
 library(tidyverse)
 library(dplyr)
 library(readr)
@@ -43,7 +43,7 @@ The data in this project comes from two separate sources, merged into one to cre
 
 The independent variable in this project is time. It is observed in two separate chunks, one from 1950 to 1963, when Solid Fuel was the majority contributor to fossil fuel Carbon Dioxide emissions and the other from 1964 to 2010, when Solid Fuel was not the majority contributor to fossil fuel Carbon Dioxide emissions. The dependent variable for this project is the average glacial mass balance change. This is a before and after experiment, as the trends for glacial mass loss are being measured in two separate time chunks. 
 
-```{r echo = FALSE}
+```{r}
 SG_SYes <- Global_FF_Data |>
   filter(`Solid Fuel Greater` == 1)
 SG_SNo <- Global_FF_Data |>

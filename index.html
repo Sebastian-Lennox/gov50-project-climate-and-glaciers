@@ -1549,6 +1549,23 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 How much does Carbon Dioxide released by the consumption of Solid Fuel contribute to loss of glacial mass? When we think about observable effects of climate disruptions and how they can exacerbate an already negative situation, glacial melting is one of the first things that comes to mind. Not only does the melting of glaciers result in habitat loss for arctic creatures, but it also contributes to rising sea levels and a difficulty in reducing rising global temperatures (due to water’s notable ability to retain heat). Thus, studying what the most detrimental contributing factors to glacial melting are is important to determining how to preserve them.</p>
 <p>While general Carbon Dioxide release and global warming are directly responsible for the loss of glacial mass, specific greenhouse gases likely have a more detrimental effect on the loss of glaciers. Specifically, Solid Fuel has been one of the greatest contributors to total global Carbon Dioxide emissions since 1950 (the start of the data set), sometimes eclipsing the carbon emissions of the rest of the pollutants combined. Therefore, I hypothesize that in years when Solid Fuel contribution to Carbon Dioxide emissions was greater than the other contributors combined, glacial mass decrease occurred at a greater (absolute) rate than in years when it did not.</p>
 <div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span></span>
+<span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span></span>
+<span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://readr.tidyverse.org'>readr</a></span><span class='op'>)</span></span>
+<span></span>
+<span><span class='va'>Global_FF_Data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://readr.tidyverse.org/reference/read_delim.html'>read_csv</a></span><span class='op'>(</span><span class='st'>"~/Downloads/co2-fossil-global_zip/data/global_csv.csv"</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='va'>Glacial_Mass</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://readr.tidyverse.org/reference/read_delim.html'>read_csv</a></span><span class='op'>(</span><span class='st'>"~/Downloads/glacier-mass-balance_zip/data/glaciers_csv.csv"</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='va'>Global_FF_Data</span> <span class='op'>&lt;-</span> <span class='va'>Global_FF_Data</span> <span class='op'>|&gt;</span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>Glacial_Mass</span>, by <span class='op'>=</span> <span class='st'>"Year"</span><span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/drop_na.html'>drop_na</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>|&gt;</span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>No_Solid <span class='op'>=</span> <span class='va'>`Total`</span> <span class='op'>-</span> <span class='va'>`Solid Fuel`</span><span class='op'>)</span> <span class='op'>|&gt;</span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span></span>
+<span>    <span class='st'>"Solid Fuel Greater"</span> <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/if_else.html'>if_else</a></span><span class='op'>(</span><span class='va'>`Solid Fuel`</span> <span class='op'>&gt;</span> <span class='va'>`No_Solid`</span>, <span class='st'>"1"</span>, <span class='st'>"0"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span><span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>Global_FF_Data</span><span class='op'>)</span><span class='op'>)</span></span></code></pre>
+</div>
 <table>
 <colgroup>
 <col style="width: 3%" />
@@ -1667,13 +1684,48 @@ How much does Carbon Dioxide released by the consumption of Solid Fuel contribut
 </tr>
 </tbody>
 </table>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>Frequency_Glacier</span> <span class='op'>&lt;-</span> </span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='va'>Global_FF_Data</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>`Mean cumulative mass balance`</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> </span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_histogram.html'>geom_histogram</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> </span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span></span>
+<span>    x <span class='op'>=</span> <span class='st'>"Change in Mass Balance of Glaciers (m of Water)"</span>, </span>
+<span>    y <span class='op'>=</span> <span class='st'>"Frequency of Changes in Mass Balance of Glaciers"</span>, </span>
+<span>    title <span class='op'>=</span> <span class='st'>"Frequency of Changes in Mass Balance from 1950 to 2010"</span></span>
+<span>  <span class='op'>)</span></span>
+<span><span class='va'>Frequency_Glacier</span></span></code></pre>
+</div>
 <p><img src="index_files/figure-html5/unnamed-chunk-1-1.png" width="624" /></p>
 </div>
 <p>Description of Data:
 The data in this project comes from two separate sources, merged into one to create the table above. The first data set, involving Carbon Dioxide emissions from specific sources, is taken from the Carbon Dioxide Information Analysis Center. The collected data spans all the way back to 1751, and includes yearly totals for Total, Gas Fuel, Liquid Fuel, Solid Fuel, Cement production, Gas Flaring, and per capita Carbon Dioxide emissions. The data from before 1950 was collected by using estimations based on energy production and trade (imports and exports) data, as opposed to solely production data (which was used for the last ~60 years of data in the set). The second data set, constructed with help from the US EPA and the World Glacier Monitoring Service, includes yearly totals for the amount of change in glacial mass and the number of glaciers observed. The former metric was observed using mass balance graphs.</p>
 <p>The independent variable in this project is time. It is observed in two separate chunks, one from 1950 to 1963, when Solid Fuel was the majority contributor to fossil fuel Carbon Dioxide emissions and the other from 1964 to 2010, when Solid Fuel was not the majority contributor to fossil fuel Carbon Dioxide emissions. The dependent variable for this project is the average glacial mass balance change. This is a before and after experiment, as the trends for glacial mass loss are being measured in two separate time chunks.</p>
 <div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>SG_SYes</span> <span class='op'>&lt;-</span> <span class='va'>Global_FF_Data</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>`Solid Fuel Greater`</span> <span class='op'>==</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span><span class='va'>SG_SNo</span> <span class='op'>&lt;-</span> <span class='va'>Global_FF_Data</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>`Solid Fuel Greater`</span> <span class='op'>==</span> <span class='fl'>0</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='va'>SG_SYes_Plot</span> <span class='op'>&lt;-</span> </span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='va'>SG_SYes</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>`Year`</span>, y <span class='op'>=</span> <span class='va'>`Mean cumulative mass balance`</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> </span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span></span>
+<span>    x <span class='op'>=</span> <span class='st'>"Year"</span>, </span>
+<span>    y <span class='op'>=</span> <span class='st'>"Change in Mass Balance of Glaciers (m of Water)"</span>, </span>
+<span>    title <span class='op'>=</span> <span class='st'>"Change in Mass Balance of Glaciers over Time (Solid Fuel Majority)"</span></span>
+<span>  <span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_smooth.html'>geom_smooth</a></span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"lm"</span>, se <span class='op'>=</span> <span class='cn'>FALSE</span>, color <span class='op'>=</span> <span class='st'>"blue"</span>, linewidth <span class='op'>=</span> <span class='fl'>1.5</span><span class='op'>)</span></span>
+<span><span class='va'>SG_SYes_Plot</span></span></code></pre>
+</div>
 <img src="index_files/figure-html5/unnamed-chunk-2-1.png" width="624" />
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>fit_SG_SYes</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>`Mean cumulative mass balance`</span> <span class='op'>~</span> <span class='va'>Year</span>, data <span class='op'>=</span> <span class='va'>SG_SYes</span><span class='op'>)</span></span>
+<span><span class='fu'>modelsummary</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/modelsummary/man/modelsummary.html'>modelsummary</a></span><span class='op'>(</span><span class='va'>fit_SG_SYes</span>,</span>
+<span>                           statistic <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"s.e. = {std.error}"</span>,</span>
+<span>                                         <span class='st'>"p = {p.value}"</span><span class='op'>)</span>,</span>
+<span>                           gof_map <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"nobs"</span>, <span class='st'>"r.squared"</span>, <span class='st'>"adj.r.squared"</span><span class='op'>)</span><span class='op'>)</span></span></code></pre>
+</div>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1755,7 +1807,26 @@ R2 Adj.
 </tr>
 </tbody>
 </table>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>SG_SNo_Plot</span> <span class='op'>&lt;-</span> </span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='va'>SG_SNo</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>`Year`</span>, y <span class='op'>=</span> <span class='va'>`Mean cumulative mass balance`</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> </span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span></span>
+<span>    x <span class='op'>=</span> <span class='st'>"Year"</span>, </span>
+<span>    y <span class='op'>=</span> <span class='st'>"Change in Mass Balance of Glaciers (m of Water)"</span>, </span>
+<span>    title <span class='op'>=</span> <span class='st'>"Change in Mass Balance of Glaciers over Time (Solid Fuel not Majority)"</span></span>
+<span>  <span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_smooth.html'>geom_smooth</a></span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"lm"</span>, se <span class='op'>=</span> <span class='cn'>FALSE</span>, color <span class='op'>=</span> <span class='st'>"blue"</span>, linewidth <span class='op'>=</span> <span class='fl'>1.5</span><span class='op'>)</span></span>
+<span><span class='va'>SG_SNo_Plot</span></span></code></pre>
+</div>
 <img src="index_files/figure-html5/unnamed-chunk-2-2.png" width="624" />
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>fit_SG_SNo</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>`Mean cumulative mass balance`</span> <span class='op'>~</span> <span class='va'>Year</span>, data <span class='op'>=</span> <span class='va'>SG_SNo</span><span class='op'>)</span></span>
+<span><span class='fu'>modelsummary</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/modelsummary/man/modelsummary.html'>modelsummary</a></span><span class='op'>(</span><span class='va'>fit_SG_SNo</span>,</span>
+<span>                           statistic <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"s.e. = {std.error}"</span>,</span>
+<span>                                         <span class='st'>"p = {p.value}"</span><span class='op'>)</span>,</span>
+<span>                           gof_map <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"nobs"</span>, <span class='st'>"r.squared"</span>, <span class='st'>"adj.r.squared"</span><span class='op'>)</span><span class='op'>)</span></span></code></pre>
+</div>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
