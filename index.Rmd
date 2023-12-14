@@ -1,15 +1,15 @@
 ---
 title: "Gov 50 Final Project"
 author: "Sebastian Lennox"
-description: "Glaciers and Climate Change"
+description: "Glaciers and Carbon Dioxide Emissions"
 output:
   distill::distill_article:
     self_contained: false
 ---
 Research Question and Hypothesis: 
-How much does Carbon Dioxide released by the consumption of solid fuel contribute to loss of glacial mass? When we think about observable effects of climate disruptions and how they can exacerbate an already negative situation, glacial melting is one of the first things that comes to mind. Not only does the melting of glaciers result in habitat loss for arctic creatures, but it also contributes to rising sea levels and a difficulty in reducing rising global temperatures (due to water's notable ability to retain heat). Thus, studying what the most detrimental contributing factors to glacial melting are is important to determining how to preserve them. 
+How much does Carbon Dioxide released by the consumption of Solid Fuel contribute to loss of glacial mass? When we think about observable effects of climate disruptions and how they can exacerbate an already negative situation, glacial melting is one of the first things that comes to mind. Not only does the melting of glaciers result in habitat loss for arctic creatures, but it also contributes to rising sea levels and a difficulty in reducing rising global temperatures (due to water's notable ability to retain heat). Thus, studying what the most detrimental contributing factors to glacial melting are is important to determining how to preserve them. 
 
-While general Carbon Dioxide release and global warming are directly responsible for the loss of glacial mass, specific greenhouse gases likely have a more detrimental effect on the loss of glaciers. Specifically, solid fuel has been one of the greatest contributors to total global Carbon Dioxide emissions since 1950 (the start of the data set), sometimes eclipsing the carbon emissions of the rest of the pollutants combined. Therefore, I hypothesize that in years when solid fuel contribution to Carbon Dioxide emissions was greater than the other contributors combined, glacial mass decrease occurred at a greater (absolute) rate than in years when it did not. 
+While general Carbon Dioxide release and global warming are directly responsible for the loss of glacial mass, specific greenhouse gases likely have a more detrimental effect on the loss of glaciers. Specifically, Solid Fuel has been one of the greatest contributors to total global Carbon Dioxide emissions since 1950 (the start of the data set), sometimes eclipsing the carbon emissions of the rest of the pollutants combined. Therefore, I hypothesize that in years when Solid Fuel contribution to Carbon Dioxide emissions was greater than the other contributors combined, glacial mass decrease occurred at a greater (absolute) rate than in years when it did not. 
 
 ```{r echo = FALSE}
 library(tidyverse)
@@ -44,19 +44,6 @@ The data in this project comes from two separate sources. The first data set, in
 The independent variable in this project is time. It is observed in two separate chunks, one from 1950 to 1963, when Solid Fuel was the majority contributor to fossil fuel Carbon Dioxide emissions and the other from 1964 to 2010, when Solid Fuel was not the majority contributor to fossil fuel Carbon Dioxide emissions. The dependent variable for this project is the average glacial mass balance change. This is a before and after experiment, as the trends for glacial mass loss are being measured in two separate time chunks. 
 
 ```{r echo = FALSE}
-Solid_Glacier <- 
-  ggplot(Global_FF_Data, aes(x = `Solid Fuel`, y = `Mean cumulative mass balance`)) + 
-  geom_point() + 
-  labs(
-    x = "Carbon Emissions from Solid Fuel (million metric tons of Carbon)", 
-    y = "Change in Mass Balance of Glaciers (m of Water)", 
-    title = "The Effect of Solid Fuel Carbon Emissions on Average Change in Galcial Mass"
-  ) +
-  geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 1.5)
-Solid_Glacier
-```
-
-```{r echo = FALSE}
 SG_SYes <- Global_FF_Data |>
   filter(`Solid Fuel Greater` == 1)
 SG_SNo <- Global_FF_Data |>
@@ -68,7 +55,7 @@ SG_SYes_Plot <-
   labs(
     x = "Year", 
     y = "Change in Mass Balance of Glaciers (m of Water)", 
-    title = "Change in Mass Balance of Glaciers over Time with Solid Fuel as a Major Contributor to CO2 Emissions"
+    title = "Change in Mass Balance of Glaciers over Time (Solid Fuel Majority)"
   ) +
   geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 1.5)
 SG_SYes_Plot
@@ -85,7 +72,7 @@ SG_SNo_Plot <-
   labs(
     x = "Year", 
     y = "Change in Mass Balance of Glaciers (m of Water)", 
-    title = "Change in Mass Balance of Glaciers over Time with Solid Fuel as a non-Major Contributor to CO2 Emissions"
+    title = "Change in Mass Balance of Glaciers over Time (Solid Fuel not Majority)"
   ) +
   geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 1.5)
 SG_SNo_Plot
@@ -96,8 +83,8 @@ modelsummary::modelsummary(fit_SG_SNo,
                                          "p = {p.value}"),
                            gof_map = c("nobs", "r.squared", "adj.r.squared"))
 ```
-Plot Interpretation (cont.): 
-The first plot tracking glacial mass loss over time in this experiment, when Solid Fuel was the majority contributor to Greenhouse Gas emissions, indicates that there was a decrease in glacial mass over the time period chosen. This matches the second plot, which is from the time period when Solid Fuel was not the majority contributor to fossil fuel Carbon Dioxide emissions. This display makes sense in the context of the first plot in this experiment, as increased Carbon Dioxide emissions from Solid Fuel correlated to a decrease in glacier mass. However, what is of more importance in both of these plots is the slope of the regression line, as the comparison of the two will indicate whether there is a correlation between Solid Fuel as the majority contributor to Carbon Dioxide emissions and overall glacial mass decrease. 
+Plot Interpretation:
+The first plot tracking glacial mass loss over time in this experiment, when Solid Fuel was the majority contributor to Greenhouse Gas emissions, indicates that there was a decrease in glacial mass over the time period chosen. This matches the second plot, which is from the time period when Solid Fuel was not the majority contributor to fossil fuel Carbon Dioxide emissions. This display makes sense in the context of the table, as increased Carbon Dioxide emissions from Solid Fuel correlated to an increase in glacial mass loss. However, what is of more importance in both of these plots is the slope of the regression line, as the comparison of the two will indicate whether there is a correlation between Solid Fuel as the majority contributor to Carbon Dioxide emissions and overall glacial mass decrease.  
 
 The main coefficient of interest in this experiment (which is placed at 680.18 for the first plot and 606.854 for the second) is not actually important, as it only denotes the beginning of when data started to be collected. Instead, what is of more significance is the slope of the lines, which for the first plot (Solid Fuel as a majority emitter) is -0.351 and for the second plot (Solid Fuel not as a majority emitter) is -0.313. In the context of the experiment, this means that for each year that progressed in either time period, that was how much glacial mass was lost (in meters of water). For both plots, the regression output claims the p-value for these slopes is less than 0.001, which means that the output is statistically significant. However, we should not necessarily interpret them causally. This is because there are several other variables involved that may not have been controlled for each year. Especially during years when Solid Fuel was a majority emitter, other fuels were increasing relatively in emissions, meaning they could have just as easily contributed to the loss of glacial mass as the Solid Fuel. 
 
